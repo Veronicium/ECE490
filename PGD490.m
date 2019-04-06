@@ -1,5 +1,7 @@
-close all
-clear all
+function [numIteration] = PGD490(r, maxStep)
+
+%close all
+%clear all
 
 [X1, X2] = meshgrid(-2:0.1:2, -2:0.1:2);
 
@@ -38,23 +40,34 @@ Z = f(X1, X2);
 
 % Coding iterative steepest descent
 
+
+
+
 % Initialize at (1,1).
-xk1 = 0.1
-xk2 = 0.1
+angle = pi/4;
+xk1 = 1e-1*cos(angle);
+xk2 = 1e-1*sin(angle);
 xk = [xk1;xk2]
 
-tolerance = 1e-10;
-toleranceGradient = 8e-7
+tolerance = 1e-10;  %f_thres    
+toleranceGradient = 1e-5;    %g_thres   8e-7
+alphak = 1;
+
+%r = 1e-3;  % r    r = rand(1,2).^(1/2); originally
+%maxStep = 20;
+numPerturb = 0;
+
 shouldIterate = true;
 
 
-iterationK = 1;
+iterationK = 1;  %t
+step = 0;
 
 % The variable 'points' will carry the points.
 points = xk;
 
 while (shouldIterate)
-    
+    %{
     display(strcat('Iteration number (k) =', num2str(iterationK)))
     display(' ')
     display(strcat( ...
@@ -62,23 +75,28 @@ while (shouldIterate)
         num2str([xk1 xk2]), ...
         ']'...
     ))
+    %}
        
-    if f(xk1, xk2) > tolerance
+    if f(xk1, xk2) > -10  %if f(xk1, xk2) > tolerance
         
         currentGradient = gradf(xk1,xk2);
 
         if norm(currentGradient,2) > toleranceGradient
+            
+            %{
             alphak = lineSearch(xk1, xk2, f, currentGradient, -currentGradient);
             % If line search does not converge, quit.
             if alphak == -1
                 display('Line search did not converge')
                 shouldIterate = false;
             end
+            alphak
+            %}
             xk1 = xk1 -  alphak* currentGradient(1);
             xk2 = xk2 -  alphak* currentGradient(2);
         else
+          if step > maxStep %can perturb
             % Perturb
-            r = rand(1,2).^(1/2);
             mu = [0 0];
             sigma = [1 0; 0 1];
             Y = mvnrnd(mu,sigma);
@@ -86,40 +104,56 @@ while (shouldIterate)
             xk1 = xk1 + p(1);
             xk2 = xk2 + p(2);
             currentGradient = gradf(xk1,xk2);
+            
+            %{
             alphak = lineSearch(xk1, xk2, f, currentGradient, -currentGradient);
             % If line search does not converge, quit.
             if alphak == -1
                 display('Line search did not converge')
                 shouldIterate = false;
             end
+            alphak
+            %}
+            
             xk1 = xk1  -  alphak* currentGradient(1);
             xk2 = xk2  -  alphak* currentGradient(2);
+            
+            step = 0;
+            numPerturb = numPerturb+1;
+          end
         end
-        xk = [xk1;xk2]
+        xk = [xk1;xk2];
         points = [points, xk]; 
         iterationK = iterationK + 1;
+        step = step + 1;
     else
         % Error is within tolerance
+        test = f(xk1, xk2)
         shouldIterate = false;     
     end
    
     if iterationK == 1500
-        display('Did not converge within 1500 iterations')
+        %display('Did not converge within 1500 iterations')
+        numIteration = -1;
         break
     end
+    
+    numIteration = iterationK;
 end
-
+%{
 % Display the final iterate, regardless of whether the process converged
 display(strcat( ...
     'The last iterate [x y] = [', ...
     num2str([xk1 xk2]), ...
     ']'...
 ))
+%}
+
+xk
+numPerturb
 
 
-
-
-
+end
 
 
 
