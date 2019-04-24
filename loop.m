@@ -26,26 +26,23 @@ for x = 0:step1:5 %%%%%
                 r = power(10,-x);  %%%%%
                 num_iteration = PGD490(r,maxstep,angle);
                 if  num_iteration == -1 
-                    finish = false;
-                    num_fail = num_fail+1;
-                    break;
+                    if finish == true
+                        finish = false;
+                        num_fail = num_fail+1;
+                    end
                 end
                 sum = sum + num_iteration;
             end
-            if finish == true
             mean = sum/20;
             if mean > score
                 score = mean;
             end
-            end
         end
-        max_iteration(x/step1+1,maxstep/step2+1) = 2000; %%%%%
-        if (num_fail == 0)
             x
             maxstep
             score
             max_iteration(x/step1+1,maxstep/step2+1) = score; %%%%%
-        end
+        
         proportion = num_fail/density
         f(x/step1+1,maxstep/step2+1) = proportion; %%%%%
          
