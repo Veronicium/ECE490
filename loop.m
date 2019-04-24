@@ -30,12 +30,11 @@ for x = 0:step1:5 %%%%%
                         finish = false;
                         num_fail = num_fail+1;
                     end
+		    sum = sum + 2000;
                 end
-                if finish == true
+
+                if  num_iteration ~= -1 
                     sum = sum + num_iteration;
-                end
-                if finish == false
-                    sum = sum + 2000;
                 end
             end
             mean = sum/20;
