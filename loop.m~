@@ -13,8 +13,8 @@ function [x,maxstep,f,max_iteration] = loop()
 step1 = 0.25;
 step2 = 25;
 
-for x = 0:step1:5 %%%%%
-    for maxstep = 0:step2:500 %%%%%
+for x = 5:step1:5 %%%%%
+    for maxstep = 450:step2:500 %%%%%
         % test
         num_fail = 0;
         density = 90;
@@ -24,7 +24,7 @@ for x = 0:step1:5 %%%%%
             sum = 0;
             for i = 1:1:20
                 r = power(10,-x);  %%%%%
-                num_iteration = PGD490(r,maxstep,angle);
+                num_iteration = PGD490(r,maxstep,angle)
                 if  num_iteration == -1 
                     if finish == true
                         finish = false;
@@ -35,10 +35,10 @@ for x = 0:step1:5 %%%%%
                     sum = sum + num_iteration;
                 end
                 if finish == false
-                    sum = sum + 2000;
+                    sum = sum+2000;
                 end
             end
-            mean = sum/20;
+            mean = sum/20
             if mean > score
                 score = mean;
             end
