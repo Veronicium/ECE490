@@ -10,30 +10,40 @@ function [x,maxstep,f,max_iteration] = loop()
 % r = 1e-x to 1e-x, x = 0:0.1:10
 % maxstep = 0:5:100
 
-step1 = 0.25;
-step2 = 25;
+step1 = 0.05;
+step2 = 10;
+start2 = 200;
+end2 = 300;
+terminate_cond = 2000;
+start1 = 2;
+end1 = 3.5;
 
-for x = 0:step1:5 %%%%%
-    for maxstep = 0:step2:500 %%%%%
+for x = start1:step1:end1 %%%%%
+    for maxstep = start2:step2:end2 %%%%%
         % test
         num_fail = 0;
-        density = 90;
+        density = 360;
         score = 0;
         for angle = 0:(2*pi/density):2*pi
             finish = true;
             sum = 0;
             for i = 1:1:20
                 r = power(10,-x);  %%%%%
-                num_iteration = PGD490(r,maxstep,angle);
-                if  num_iteration == -1 
+                num_iteration = PGD490(r,maxstep,angle, terminate_cond);
+                if  num_iteration < 0
                     if finish == true
                         finish = false;
                         num_fail = num_fail+1;
                     end
-		    sum = sum + 2000;
+                    sum = sum + terminate_cond;
+                end
+                
+                if num_iteration == -2
+                    x
+                    maxstep
                 end
 
-                if  num_iteration ~= -1 
+                if  num_iteration >= 0 
                     sum = sum + num_iteration;
                 end
             end
@@ -45,24 +55,36 @@ for x = 0:step1:5 %%%%%
             x
             maxstep
             score
-            max_iteration(x/step1+1,maxstep/step2+1) = score; %%%%%
+            max_iteration( round(  (x-start1)/step1+1  ), round(  (maxstep-start2)/step2+1  ) ) = score; %%%%%
         
         proportion = num_fail/density
-        f(x/step1+1,maxstep/step2+1) = proportion; %%%%%
+        f( round(  (x-start1)/step1+1  ),  round(  (maxstep-start2)/step2+1  )) = proportion; %%%%%
          
     end
 end
-x = 0:step1:5;
-maxstep = 0:step2:500;
 
-mesh(maxstep,x,f);
-ylabel('-lg(rou)*4')
-xlabel('maxstep/25')
+x = start1:step1:end1;
+maxstep = start2:step2:end2;
+%{
+
+mesh(maxstep5000,x5000,f5000);
+ylabel('-lg(rou)')
+xlabel('maxstep')
 zlabel('proportion')
+rotate3d on;
 
-mesh(maxstep,x,max_iteration);
-ylabel('-lg(rou)', 'Rotation',20)
-xlabel('maxstep', 'Rotation',-30)
-zlabel('max_itaration')
+mesh(maxstep5000,x5000,max_iteration5000);
+ylabel('-lg(rou)')
+xlabel('maxstep')
+zlabel('max iteration')
+rotate3d on;
 
+heatmap(maxstep5000,x5000,max_iteration5000)
+ylabel('-lg(rou)')
+xlabel('maxstep')
+
+heatmap(maxstep5000,x5000,f5000)
+ylabel('-lg(rou)')
+xlabel('maxstep')
+%}
 end
